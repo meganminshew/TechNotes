@@ -1,0 +1,6 @@
+create subcube MyCube as select Filter ( ( [DimLocation].[Latitude].[Latitude], [DimLocation].[Longitude].[Longitude] ), ( ZipCalculatorLib.GetDistance( 43.474208, [DimLocation].[Latitude].CurrentMember.MemberValue, 96.687689, DimLocation.Longitude.CurrentMember.MemberValue) < 100 ) ) on 0 from MyCube; select DimProducts.Product.Product on rows, Measures.RowCount on columns from MyCube;
+
+
+
+
+public static double GetDistance(double startLat, double endLat, double startLong, double endLong) { return Math.Sqrt(Math.Pow(69.1 * (startLat - endLat), 2) + Math.Pow(Math.Cos(endLat / 57.3) * 69.1 * (startLong - endLong), 2)); }

@@ -1,0 +1,40 @@
+'parameter contains Label and Value Label:
+'Label: Policy Type; Value = [Policy_Type].[Policy_Type_Description].CURRENTMEMBER.MEMBER_CAPTION
+'Label: Product Type; Value = [Product_Type].[Product_Type_Description].CURRENTMEMBER.MEMBER_CAPTION
+
+
+dim sRowParam as string = above selection value
+dim sColParam as string
+dim sMDX as string = "with member [Measures].[x] as ' & sRowParam
+sMDX = sMDX & " member [Measures].[y] as ' & sColParam
+sMDX = sMDX & " select [Measures].[x] on rows, [Measures].[y] on columns from Cube"
+	
+
+
+
+CREATE MEMBER CURRENTCUBE.[Measures].[Historic Policy Count]
+ AS '([Measures].[Policy Count], ParallelPeriod ([Month End Date].[Month End Date Hierarchy].[Month], [Historic Measures].CurrentMember.member_key, [Month End Date].[Month End Date Hierarchy].CurrentMember))', 
+FORMAT_STRING = "#,##0;-#,##0", 
+NON_EMPTY_BEHAVIOR = { [Policy Count] }, 
+VISIBLE = 1 ,  DISPLAY_FOLDER = 'Historic Policies' ,  ASSOCIATED_MEASURE_GROUP = 'Policies'  ;  
+
+
+Historic Measures.Period.IsAggregatable = False
+
+
+CurrentMember.member_key
+CurrentMember.member_caption
+CurrentMember.membervalue
+
+
+
+with member [a] as '[Historic Measures].DefaultMember.Name'
+member [b] as '[Historic Measures].CurrentMember.Name'
+member [c] as '[Historic Measures].[Period].CurrentMember.member_key'
+member [d] as '[Month End Date].[Month End Date Hierarchy].CurrentMember.Parent.Parent.Parent.member_caption'
+member [e] as '([Measures].[Policy Count],ParallelPeriod([Month End Date].[Month End Date Hierarchy].[Month], [Historic Measures].[Period].CurrentMember.member_key, [Month End Date].[Month End Date Hierarchy].CurrentMember))'
+member [f] as '[Historic Measures].[Period].CurrentMember.membervalue'
+
+select {measures.[Policy Count], [a], [b], [c], [d], [e],[f]} on columns,
+([Historic Measures].[Period].Members, [Month End Date].[Month End Date Hierarchy].[Month End Date].Members) on rows
+from [Concentric_Review]
